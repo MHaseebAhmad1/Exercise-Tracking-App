@@ -40,10 +40,8 @@ app.get("/show", async (req, res) => {
 
 app.post("/create", upload.single('testImage'), (req, res) => {
     let user = new model({
-        id: req.body.id,
         name: req.body.name,
         email: req.body.email,
-        phone: req.body.phone,
         exercise: req.body.exercise,
         date: req.body.date,
         duration: req.body.duration,
@@ -53,7 +51,7 @@ app.post("/create", upload.single('testImage'), (req, res) => {
             contentType: 'image/png'
         }
     });
-    user.save().then((a) => { res.send(a) });
+    user.save().then((a) => { res.send(a) }).catch((err) => res.status(400).json("Error: " + err));
 });
 
 app.delete('/delete/:_id', async (req, res) => {
@@ -64,10 +62,8 @@ app.delete('/delete/:_id', async (req, res) => {
 app.patch("/update/:_id", upload.single('testImage'), function (req, res) {
     model.findOneAndUpdate({ _id: req.params._id }, {
         $set: {
-            id: req.body.id,
             name: req.body.name,
             email: req.body.email,
-            phone: req.body.phone,
             exercise: req.body.exercise,
             date: req.body.date,
             duration: req.body.duration,

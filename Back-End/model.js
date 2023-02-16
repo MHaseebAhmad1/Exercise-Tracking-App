@@ -1,10 +1,8 @@
 const mongoose = require('mongoose');
 
 const userdata = mongoose.Schema({
-    id: String,
     name: String,
     email: String,
-    phone: String,
     exercise: String,
     date: String,
     duration: String,

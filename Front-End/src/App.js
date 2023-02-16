@@ -1,21 +1,23 @@
 import './App.css';
-import React, { useState, useRef, useEffect, createContext } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import Page from './Components/Page';
+import Add from './Components/Add';
+import Show from './Components/Show';
+import Signup from './Components/Signup';
+import Login from './Components/Login';
 
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 export const Global = createContext();
 function App() {
 
-  const id = useRef();
-  const name = useRef();
-  const email = useRef();
-  const phone = useRef();
-  const duration = useRef();
   const [data, setData] = useState([]);
   const [data1, setData1] = useState({});
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState([]);
   const [_id, setId] = useState();
   const [file, setFile] = useState();
+
 
   function myChange(e) {
     if (e.target.name === "testImage") {
@@ -26,29 +28,24 @@ function App() {
       setData1({ ...data1, [name]: value });
     }
   }
-  const handleDelete = (index, id) => {
+  const handleDelete = (id) => {
     delChild(id);
   }
 
   const handleEdit = (index, _id) => {
-    id.current.value = data[index].id;
-    name.current.value = data[index].name;
-    email.current.value = data[index].email;
-    phone.current.value = data[index].phone;
-    duration.current.value = data[index].duration;
     setCount(index);
     setId(_id);
   }
 
   const func = (person) => {
-    if (count === 0) {
+    if (count.length === 0) {
       postChild(person);
     }
     else {
       updateChild(_id, person);
-      setCount(0);
+      setCount([]);
     }
-    setData1("");
+    setData1({});
 
   };
 
@@ -63,15 +60,13 @@ function App() {
 
   const postChild = async (person) => {
     let form = new FormData();
-    form.append("id", person.id);
     form.append("name", person.name);
     form.append("email", person.email);
-    form.append("phone", person.phone);
     form.append("exercise", person.exercise);
     form.append("date", person.date);
     form.append("duration", person.duration);
     form.append("testImage", file);
-    
+
     try {
       await fetch("http://127.0.0.1:4000/create", {
         method: 'POST',
@@ -109,10 +104,11 @@ function App() {
 
   const updateChild = async (id, person) => {
     let form = new FormData();
-    form.append("id", person.id);
     form.append("name", person.name);
     form.append("email", person.email);
-    form.append("phone", person.phone);
+    form.append("exercise", person.exercise);
+    form.append("date", person.date);
+    form.append("duration", person.duration);
     form.append("testImage", file);
 
     try {
@@ -136,9 +132,21 @@ function App() {
 
   return (
     <>
-      <Global.Provider value={{ myApi: data, data1: data1, id: id, name: name, email: email, phone: phone, duration: duration, myFunc: func, myChange: myChange, handleDelete: handleDelete, handleEdit: handleEdit }}>
-        <Page />
-      </Global.Provider>
+      <Router>
+        <Routes>
+        <Route path={"/Signup"} element={<Signup />}></Route>
+        <Route path={"/Login"} element={<Login />}></Route>
+          <Route path={"/"} element={<Page />}></Route>
+          <Route path={"/Add"} element={<Global.Provider value={{ data1: data1, myFunc: func, myChange: myChange }}>
+            <Add />
+          </Global.Provider>}>
+          </Route>
+          <Route path={"/Show"} element={<Global.Provider value={{ myApi: data, handleDelete: handleDelete, handleEdit: handleEdit, data1: data1, myFunc: func, myChange: myChange }}>
+            <Show />
+          </Global.Provider>}>
+          </Route>
+        </Routes>
+      </Router>
     </>
   );
 }
